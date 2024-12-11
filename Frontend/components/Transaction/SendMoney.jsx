@@ -47,21 +47,20 @@ const SendMoney = ({ navigation }) => {
 
     if (!jwtToken) {
       Alert.alert("Error", "JWT token is missing. Please log in again.");
+      navigation.navigate("Login");
       return;
     }
 
     setLoading(true); // Show loader
-    axios
-      .post(
+    axios.post(
         `${url}/api/transaction/send-money`,
         { recipient, amount },
         {
           headers: { Authorization: `Bearer ${jwtToken}` },
-          timeout: 10000,
+          timeout: 20000,
         }
       )
       .then((response) => {
-        console.log(response.data)
           Alert.alert("Success", `₹${amount} sent to ${recipient}.`);
           setAmount("");
           setRecipient("");
@@ -70,7 +69,11 @@ const SendMoney = ({ navigation }) => {
         Alert.alert("Error",error.response.data.error);
       })
       .finally(() => {
-        setLoading(false); // Hide loader
+        setLoading(false);
+        console.log(response)
+        if (!response || !response.data) {
+          Alert.alert("Error", "No response from the server.");
+        }
       });
   };
 
