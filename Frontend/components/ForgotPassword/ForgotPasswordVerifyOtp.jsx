@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, ImageBackground, Dimensions, TouchableOpacity, 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { OtpInput } from "react-native-otp-entry";
 import axios from 'axios';
-import { Button } from 'react-native-paper';
 import { url_api } from '../../impUrl';
 
 const { width, height } = Dimensions.get("window");
