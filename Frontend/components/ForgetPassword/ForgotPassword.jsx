@@ -11,7 +11,7 @@ const ForgotPassword = ({ navigation }) => {
 
   const handleNext = async () => {
     if (!email) {
-      Alert.alert("Error", "Please enter an email address");
+      Alert.alert("Error", "Please enter a email address");
       return;
     }
 
