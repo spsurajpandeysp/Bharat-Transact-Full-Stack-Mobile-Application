@@ -1,29 +1,28 @@
-import { ActivityIndicator, Image, StyleSheet, Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
-import React, { useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TextInput, View, TouchableOpacity, Dimensions, ImageBackground, Alert } from 'react-native';
+import React, { useState } from 'react';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import AntDesign from "react-native-vector-icons/AntDesign"; 
 import axios from "axios";
 import { url_api } from '../../impUrl';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const { width, height } = Dimensions.get("window");
+
 const url = url_api;
 
-const Login = ({ navigation }) => {
+export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
-    // Prevent further clicks while processing
-    if (loading) return;
+    if (loading) return; 
 
-    // Check if both email and password are provided
     if (!email || !password) {
       Alert.alert("Error", "Please fill in both email and password!");
       return;
     }
 
-    setLoading(true); // Start loading
+    setLoading(true); 
     axios.post(`${url}/auth/api/login`, { email, password })
       .then(async (response) => {
         const jwt = response.data.token;
@@ -43,7 +42,7 @@ const Login = ({ navigation }) => {
             Alert.alert("Error", "Invalid password. Please try again.");
           } else if (errorMessage.includes("Please verify your email before logging in.")) {
             Alert.alert("Error", "Please verify your email before logging in.");
-            navigation.navigate("EmailVerifyOtp",{email,from:"LoginPage"})
+            navigation.navigate("EmailVerifyOtp", { email, from: "LoginPage" });
           } else {
             Alert.alert("Error", errorMessage || "Login failed. Please try again later.");
           }
@@ -51,9 +50,8 @@ const Login = ({ navigation }) => {
           Alert.alert("Error", "Unable to connect to the server. Please try again later.");
         }
       })
-      .finally(() => setLoading(false)); // Stop loading
+      .finally(() => setLoading(false)); 
   };
-
   const handleCreateAccount = () => {
     navigation.navigate("SignUp"); 
   };
@@ -220,4 +218,3 @@ const styles = StyleSheet.create({
     fontWeight:'900'
   },
 });
-
