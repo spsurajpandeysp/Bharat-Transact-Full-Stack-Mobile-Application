@@ -1,39 +1,37 @@
-import { Image, StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
-import React, { useState } from "react";
+import { ImageBackground, StyleSheet, Text, View, TextInput, TouchableOpacity, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import axios from "axios";
 import { url_api } from '../../impUrl';
+import axios from 'axios';
+
+const { width, height } = Dimensions.get("window");
 const url = url_api;
 
-const SignUp = ({ navigation }) => {
+const New = ({ navigation }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false); // State for loader
-
+  const [loading, setLoading] = useState(false); 
   const handleSignup = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill all the fields!");
       return;
     }
-  
+
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match!");
       return;
     }
-  
-    setLoading(true); // Show loader
-  
+    setLoading(true); 
     axios.post(`${url}/auth/api/signup`, {
       firstName,
       lastName,
       email,
       password,
       confirmPassword,
-    })
+    }, { timeout: 20000 })
       .then((response) => {
         setLoading(false);
         if (response.status === 201 || response.status === 200) {
@@ -43,7 +41,7 @@ const SignUp = ({ navigation }) => {
         }
       })
       .catch((error) => {
-        setLoading(false); 
+        setLoading(false);
         if (error.response) {
           if (error.response.status === 400) {
             Alert.alert("Error", error.response.data.message || "All fields are required.");
@@ -57,22 +55,15 @@ const SignUp = ({ navigation }) => {
         }
       });
   };
-  
-
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <View style={styles.topImageContainer}>
-          <Image source={require("./Vector 1.png")} style={styles.topImage} />
-        </View>
-        <View style={styles.helloContainer}>
-          <Text style={styles.helloText}>Create Account</Text>
-        </View>
-        <Text style={styles.signUpText}>Fill in the details below</Text>
-
-        {/* Input Fields */}
-        <View style={styles.inputContainer}>
-          <FontAwesome name={"user"} size={24} color={"#949A9A"} style={styles.inputIcon} />
+    <ImageBackground
+      source={require('./bgc.jpg')}
+      style={styles.container}
+    >
+      <Text style={styles.headingText}>Create Account</Text>
+      <View style={styles.inputs}>
+        <View style={styles.InputContainer}>
+          <FontAwesome name={"user"} size={24} color={"#000"} style={styles.inputIcon} />
           <TextInput
             style={styles.textInput}
             placeholder="First Name"
@@ -80,8 +71,8 @@ const SignUp = ({ navigation }) => {
             onChangeText={setFirstName}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <FontAwesome name={"user"} size={24} color={"#949A9A"} style={styles.inputIcon} />
+        <View style={styles.InputContainer}>
+          <FontAwesome name={"user"} size={24} color={"#000"} style={styles.inputIcon} />
           <TextInput
             style={styles.textInput}
             placeholder="Last Name"
@@ -89,8 +80,8 @@ const SignUp = ({ navigation }) => {
             onChangeText={setLastName}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <FontAwesome name={"envelope"} size={24} color={"#949A9A"} style={styles.inputIcon} />
+        <View style={styles.InputContainer}>
+          <FontAwesome name={"envelope"} size={24} color={"#000"} style={styles.inputIcon} />
           <TextInput
             style={styles.textInput}
             placeholder="Email"
@@ -98,8 +89,8 @@ const SignUp = ({ navigation }) => {
             onChangeText={setEmail}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <FontAwesome name={"lock"} size={24} color={"#949A9A"} style={styles.inputIcon} />
+        <View style={styles.InputContainer}>
+          <FontAwesome name={"lock"} size={24} color={"#000"} style={styles.inputIcon} />
           <TextInput
             style={styles.textInput}
             placeholder="Password"
@@ -108,8 +99,8 @@ const SignUp = ({ navigation }) => {
             secureTextEntry
           />
         </View>
-        <View style={styles.inputContainer}>
-          <FontAwesome name={"lock"} size={24} color={"#949A9A"} style={styles.inputIcon} />
+        <View style={styles.InputContainer}>
+          <FontAwesome name={"lock"} size={24} color={"#000"} style={styles.inputIcon} />
           <TextInput
             style={styles.textInput}
             placeholder="Confirm Password"
@@ -118,132 +109,99 @@ const SignUp = ({ navigation }) => {
             secureTextEntry
           />
         </View>
-
-        {/* Submit Button */}
-        <TouchableOpacity
-          style={styles.signButtonContainer}
-          onPress={handleSignup}
-          disabled={loading} // Disable button while loading
-        >
-          <View style={styles.solidButton}>
+      </View>
+      <View style={styles.btns}>
+        <TouchableOpacity onPress={handleSignup} disabled={loading}>
+          <View style={styles.SignUps}>
             {loading ? (
-              <ActivityIndicator size="small" color="white" /> // Loader
+              <ActivityIndicator size="small" color="white" />
             ) : (
-              <>
-                <Text style={styles.textDesign}>Sign Up</Text>
-                <AntDesign name={"arrowright"} size={24} color={"white"} />
-              </>
+              <Text style={styles.btnText}>Sign Up</Text>
             )}
           </View>
         </TouchableOpacity>
-
-        {/* Footer */}
-        <View style={styles.footerTextContainer}>
-          <Text style={styles.footerText}>
-            Already have an account?{" "}
-            <Text
-              style={{ textDecorationLine: "underline" }}
-              onPress={() => navigation.navigate("Login")}
-            >
-              Sign In
-            </Text>
-          </Text>
-        </View>
       </View>
-    </ScrollView>
+      <View style={styles.CreateContainer}>
+          <Text
+            style={styles.CreateContainerText}
+            onPress={() => navigation.navigate('Login')}
+          >
+            Already Have an Account
+          </Text>
+      </View>
+    </ImageBackground>
   );
 };
 
-export default SignUp;
-
-// Styles remain the same
-
-
-
-
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1, 
-  },
   container: {
-    backgroundColor: "#F5F5F5",
     flex: 1,
-    position: "relative"
-  },
-  topImageContainer: {},
-  topImage: {
-    width: "100%",
-    height: 130,
-  },
-  helloContainer: {},
-  helloText: {
-    textAlign: "center",
-    fontSize: 50,
-    fontWeight: "500",
-    color: "#262626",
-  },
-  signUpText: {
-    textAlign: "center",
-    fontSize: 18,
-    color: "#262626",
-    marginBottom: 30,
-  },
-  inputContainer: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    marginHorizontal: 40,
-    elevation: 10,
-    marginVertical: 15,
-    flexDirection: "row", 
-    height: 50, 
+    justifyContent: "flex-start",
     alignItems: "center",
+    paddingTop: height * 0.11,
+  },
+  headingText: {
+    color: "#1F41B1",
+    fontSize: height * 0.08,
+    fontWeight: "900",
+  },
+  inputs: {
+    paddingTop: height * 0.01,
+    width: "80%",
+  },
+  InputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: width * 0.8,
+    height: height * 0.07,
+    backgroundColor: "#BED8FE",
+    borderRadius: 10,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    elevation: 5,
   },
   inputIcon: {
-    marginLeft: 15,
+    marginRight: 10,
   },
   textInput: {
     flex: 1,
-    paddingLeft: 10, 
-    fontSize: 16, 
+    fontSize: height * 0.02,
+    paddingVertical: 10,
   },
-  signButtonContainer: {
-    flexDirection: "row",
-    marginTop: 40, 
-    justifyContent: "flex-end",
-    width: "90%",
-    color: "black"
-  },
-  solidButton: {
-    flexDirection: "row",
-    alignItems: "center",
+  btns: {
+    paddingTop: 5,
+    flexDirection: 'column',
+    alignItems: 'center',
     justifyContent: "center",
+  },
+  SignUps: {
+    fontSize: height * 0.025,
+    color: 'white',
+    backgroundColor: '#1F41BB',
+    borderRadius: 6,
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: "#FF5722", // Solid color (Orange Red)
-    borderRadius: 25,
-  },
-  textDesign: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "white", // White text to contrast with the solid color background
-    marginRight: 10, // Space between text and icon
-  },
-  footerTextContainer: {
+    paddingHorizontal: 50,
+    fontWeight: "700",
+    width: width * 0.8,
     textAlign: "center",
-    marginTop: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  footerText: {
-    color: "Black",
+  btnText: {
+    fontSize: height * 0.025,
+    color: 'white',
+    fontWeight: "700",
+  },
+  CreateContainer: {
     textAlign: "center",
-    fontSize: 15,
+    marginTop: 15,
   },
-  leftImageContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
+  CreateContainerText: {
+    color: "#1F41B1",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: '900',
   },
-  leftImage: {
-    height: 500,
-    width: 230,
-  }
-}); 
+});
+
+export default New;

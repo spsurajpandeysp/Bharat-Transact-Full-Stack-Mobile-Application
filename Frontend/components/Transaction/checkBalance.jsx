@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // To store/retrieve the token locally
-import {url_api} from '../../impUrl'
+import { url_api } from '../../impUrl';
+
 const url = url_api;
-const CheckBalance = ({ navigation }) => {
+
+const CheckBalance = () => {
   const [balance, setBalance] = useState(null);
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +43,7 @@ const CheckBalance = ({ navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3813C2CC" />
+        <ActivityIndicator size="large" color="#fff" />
       </View>
     );
   }
@@ -56,124 +57,63 @@ const CheckBalance = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.appName}>Bharat Transact</Text>
-        </View>
-
-        {/* Bell Icon */}
-        <TouchableOpacity style={styles.bellIcon}>
-          <AntDesign name="bells" size={25} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Balance Info */}
-      <View style={styles.balanceContainer}>
-        <Text style={styles.balanceTitle}>Account Balance</Text>
-        <Text style={styles.balanceAmount}>₹{balance}</Text>
-        <Text style={styles.balanceUser}>{userName}</Text>
-      </View>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate("Home")}>
-          <AntDesign name="home" size={20} color="#fff" />
-          <Text style={styles.footerText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <AntDesign name="contacts" size={20} color="#fff" />
-          <Text style={styles.footerText}>Contact Us</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <AntDesign name="wechat" size={20} color="#fff" />
-          <Text style={styles.footerText}>Chat Bot</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.balanceCard}>
+      <Text style={styles.balanceTitle}>Account Balance</Text>
+      <Text style={styles.balanceAmount}>₹{balance}</Text>
+      <Text style={styles.balanceUser}>{userName}</Text>
     </View>
   );
 };
 
-export default CheckBalance;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: "relative",
-  },
-  header: {
-    backgroundColor: "#3813C2CC",
-    paddingVertical: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 25,
-    marginBottom: 30,
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  appName: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-  bellIcon: {
-    marginRight: 15,
-  },
-  balanceContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 50,
-    alignItems: "center",
-  },
-  balanceTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 10,
-  },
-  balanceAmount: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#4caf50",
-    marginBottom: 10,
-  },
-  balanceUser: {
-    fontSize: 18,
-    color: "#333",
-  },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#004aad",
-    paddingVertical: 10,
-  },
-  footerButton: {
-    alignItems: "center",
-  },
-  footerText: {
-    color: "#fff",
-    fontSize: 12,
-    marginTop: 5,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#1F41B1",
   },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FFCDD2",
+    padding: 20,
   },
   errorText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "red",
+    fontWeight: "bold",
+  },
+  balanceCard: {
+    backgroundColor: "#1F41B1", 
+    width: "90%",
+    borderRadius: 12,
+    paddingVertical: 25,
+    paddingHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 20,
+    alignItems: "center",
+    elevation: 10, 
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+  },
+  balanceTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 10,
+  },
+  balanceAmount: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#ffffff",
+    marginBottom: 10,
+  },
+  balanceUser: {
+    fontSize: 20,
+    color: "white",
   },
 });
+
+export default CheckBalance;

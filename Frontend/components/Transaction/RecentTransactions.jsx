@@ -4,7 +4,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { url_api } from '../../impUrl';
-const url = url_api
+
+const url = url_api;
 
 const RecentTransactions = ({ navigation }) => {
   const [transactions, setTransactions] = useState([]);
@@ -13,22 +14,21 @@ const RecentTransactions = ({ navigation }) => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        // Retrieve the JWT token from AsyncStorage
         const token = await AsyncStorage.getItem('jwt_token');
         if (!token) {
           console.error('JWT not found in AsyncStorage');
           setLoading(false);
           return;
         }
-
-        // Fetch transactions from the server
         const response = await axios.get(`${url}/api/transaction/user`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        setTransactions(response.data.transactions || []);
+        // Reverse the transaction array to show the latest transaction first
+        const reversedTransactions = response.data.transactions.reverse();
+        setTransactions(reversedTransactions || []);
       } catch (error) {
         console.error('Error fetching transactions:', error.message);
       } finally {
@@ -38,67 +38,37 @@ const RecentTransactions = ({ navigation }) => {
 
     fetchTransactions();
   }, []);
-
+  
   const renderTransaction = ({ item }) => (
     <View style={styles.transactionItem}>
       <Text style={styles.transactionText}>
-        <Text style={styles.bold}>{item.toUser.firstName} {item.toUser.lastName}</Text> received ₹{item.amount}
+        <Text style={styles.bold}>
+          {item.toUser.firstName} {item.toUser.lastName}
+        </Text>
+        {" "}received ₹{item.amount}
       </Text>
       <Text style={styles.transactionDate}>Transaction ID: {item.transactionId}</Text>
     </View>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#004aad" />
-        <Text>Loading transactions...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.appName}>Bharat Transact</Text>
-        </View>
-        {/* Bell Icon */}
-        <TouchableOpacity style={styles.bellIcon}>
-          <AntDesign name="bells" size={25} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
       <Text style={styles.title}>Recent Transactions</Text>
-
-      {/* Recent Transactions List */}
-      {transactions.length > 0 ? (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1F41B1" />
+        </View>
+      ) : (
         <FlatList
           data={transactions}
           renderItem={renderTransaction}
           keyExtractor={(item) => item.transactionId}
           contentContainerStyle={styles.transactionsList}
         />
-      ) : (
+      )}
+      {transactions.length === 0 && !loading && (
         <Text style={styles.noTransactions}>No transactions found.</Text>
       )}
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Home')}>
-          <AntDesign name="home" size={20} color="#fff" />
-          <Text style={styles.footerText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <AntDesign name="contacts" size={20} color="#fff" />
-          <Text style={styles.footerText}>Contact Us</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <AntDesign name="wechat" size={20} color="#fff" />
-          <Text style={styles.footerText}>Chat Bot</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -108,58 +78,43 @@ export default RecentTransactions;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'relative',
+    paddingTop: 20,
+    backgroundColor: '#f9f9f9',
   },
-
-  header: {
-    backgroundColor: '#3813C2CC',
-    paddingVertical: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 25,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  appName: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  bellIcon: {
-    marginRight: 15,
-  },
-
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#1F41B1',
     marginBottom: 20,
     textAlign: 'center',
   },
 
   transactionsList: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     paddingBottom: 60,
   },
 
   transactionItem: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
 
   transactionText: {
     fontSize: 16,
     color: '#333',
+    marginBottom: 5,
   },
 
   transactionDate: {
     fontSize: 14,
-    color: '#666',
+    color: '#888',
     marginTop: 5,
   },
 
@@ -169,7 +124,7 @@ const styles = StyleSheet.create({
 
   noTransactions: {
     textAlign: 'center',
-    color: '#666',
+    color: '#888',
     fontSize: 16,
     marginTop: 20,
   },
@@ -178,24 +133,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#004aad',
-    paddingVertical: 10,
-  },
-  footerButton: {
-    alignItems: 'center',
-  },
-  footerText: {
-    color: '#fff',
-    fontSize: 12,
-    marginTop: 5,
   },
 });

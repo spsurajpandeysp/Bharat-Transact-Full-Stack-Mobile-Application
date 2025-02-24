@@ -6,11 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Home = ({navigation}) => {
   const logout = async () => {
     try {
-    
       await AsyncStorage.removeItem('jwt_token');
-
-  
-   
       navigation.replace('OpenAppLoading'); 
     } catch (error) {
       console.error('Error during logout:', error);

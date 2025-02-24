@@ -9,24 +9,17 @@ const OpeningLoadingScreen = () => {
   useEffect(() => {
     const timer = setTimeout(async () => {
       try {
-        // Get the JWT token from AsyncStorage
         const jwtToken = await AsyncStorage.getItem("jwt_token");
-
         if (jwtToken) {
-          // If JWT is present, navigate to Home
           navigation.replace("Home");
         } else {
-          // If JWT is not found, navigate to Login
           navigation.replace("Login");
         }
       } catch (error) {
         console.error("Error reading JWT from AsyncStorage", error);
-        // If an error occurs, navigate to Login
         navigation.replace("Login");
       }
-    }, 5000); // Delay for 5 seconds
-
-    // Cleanup timeout on unmount
+    }, 5000); 
     return () => clearTimeout(timer);
   }, [navigation]);
 

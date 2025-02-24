@@ -7,12 +7,29 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ImageBackground,
+  Dimensions,
 } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
+
 const { url_api } = require("../../impUrl");
 const url = url_api;
+const { width, height } = Dimensions.get("window");
+
+// Logout function
+const logout = async () => {
+  try {
+    await AsyncStorage.removeItem("jwt_token");
+    navigation.replace("OpenAppLoading");
+  } catch (error) {
+    Alert.alert("An Error Occurred While logging out. Please Try Again Later");
+  }
+};
 
 const SendMoney = ({ navigation }) => {
   const [amount, setAmount] = useState("");
@@ -39,6 +56,7 @@ const SendMoney = ({ navigation }) => {
     fetchToken();
   }, []);
 
+  // Handle send money request
   const handleSendMoney = () => {
     if (!amount || !recipient) {
       Alert.alert("Error", "Please enter both recipient and amount.");
@@ -52,7 +70,8 @@ const SendMoney = ({ navigation }) => {
     }
 
     setLoading(true); // Show loader
-    axios.post(
+    axios
+      .post(
         `${url}/api/transaction/send-money`,
         { recipient, amount },
         {
@@ -61,59 +80,65 @@ const SendMoney = ({ navigation }) => {
         }
       )
       .then((response) => {
-          Alert.alert("Success", `₹${amount} sent to ${recipient}.`);
-          setAmount("");
-          setRecipient("");
+        Alert.alert("Success", `₹${amount} sent to ${recipient}.`);
+        setAmount("");
+        setRecipient("");
       })
       .catch((error) => {
-        Alert.alert("Error",error.response.data.error);
+        console.log(error.response ? error.response.data : error);
+        Alert.alert("Error", error.response.data.error);
       })
       .finally(() => {
         setLoading(false);
-        console.log(response)
-        if (!response || !response.data) {
-          Alert.alert("Error", "No response from the server.");
-        }
       });
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.appName}>Bharat Transact</Text>
+    <ImageBackground source={require("./bgc.jpg")} style={styles.container}>
+      <Text style={styles.headingText}>Send Money</Text>
+      <View style={styles.inputs}>
+        <View style={styles.RecipientContainer}>
+          <FontAwesome
+            name={"user"}
+            size={24}
+            color={"#000"}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            placeholder="Recipient Name"
+            style={styles.textInput}
+            value={recipient}
+            onChangeText={(text) => setRecipient(text.toLowerCase())}
+          />
         </View>
-        <TouchableOpacity style={styles.bellIcon}>
-          <AntDesign name="bells" size={25} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Send Money</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Recipient Name"
-          value={recipient}
-          onChangeText={setRecipient}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Amount"
-          value={amount}
-          onChangeText={setAmount}
-          keyboardType="numeric"
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, loading && styles.sendButtonDisabled]}
-          onPress={handleSendMoney}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.sendButtonText}>Send Money</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.AmountContainer}>
+          <FontAwesome
+            name={"money"}
+            size={24}
+            color={"#000"}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            placeholder="Amount"
+            style={styles.textInput}
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={setAmount}
+          />
+        </View>
+        <View style={[styles.btns, styles.PayBtn]}>
+          <TouchableOpacity
+            style={[styles.sendButton, loading && styles.sendButtonDisabled]}
+            onPress={handleSendMoney}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.btnText}>Proceed To Pay</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.footer}>
@@ -121,19 +146,22 @@ const SendMoney = ({ navigation }) => {
           style={styles.footerButton}
           onPress={() => navigation.navigate("Home")}
         >
-          <AntDesign name="home" size={20} color="#fff" />
-          <Text style={styles.footerText}>Home</Text>
+          <AntDesign name="home" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => navigation.navigate("SendMoney")}
+        >
+          <MaterialIcons name="send-to-mobile" size={24} color="white" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton}>
-          <AntDesign name="contacts" size={20} color="#fff" />
-          <Text style={styles.footerText}>Contact Us</Text>
+          <MaterialCommunityIcons name="qrcode-scan" size={24} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
-          <AntDesign name="wechat" size={20} color="#fff" />
-          <Text style={styles.footerText}>Chat Bot</Text>
+        <TouchableOpacity style={styles.footerButton} onPress={logout}>
+          <AntDesign name="logout" size={24} color="white" />
         </TouchableOpacity>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -142,65 +170,73 @@ export default SendMoney;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "relative",
-  },
-  header: {
-    backgroundColor: "#3813C2CC",
-    paddingVertical: 15,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
-    marginBottom: 30,
-    marginTop: 25,
+    paddingTop: height * 0.15,
   },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+  headingText: {
+    color: "#1F41B1",
+    fontSize: height * 0.08,
+    fontWeight: "900",
   },
-  appName: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
+  inputs: {
+    paddingTop: height * 0.1,
+    width: "80%",
   },
-  bellIcon: {
-    marginRight: 15,
+  inputIcon: {
+    marginRight: 10,
   },
-  formContainer: {
-    paddingHorizontal: 20,
+  textInput: {
     flex: 1,
-    marginBottom: 50,
+    fontSize: height * 0.02,
+    paddingVertical: 10,
+  },
+  RecipientContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: width * 0.8,
+    height: height * 0.07,
+    backgroundColor: "#BED8FE",
+    borderRadius: 10,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    elevation: 5,
+  },
+  AmountContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: width * 0.8,
+    height: height * 0.07,
+    backgroundColor: "#BED8FE",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    elevation: 5,
+  },
+  btns: {
+    flexDirection: "column",
+    alignItems: "center",
     justifyContent: "center",
+    marginTop: 30,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    height: 45,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-    paddingLeft: 10,
-    fontSize: 16,
-  },
-  sendButton: {
-    backgroundColor: "#4caf50",
+  PayBtn: {
+    fontSize: height * 0.025,
+    color: "white",
+    backgroundColor: "#1F41BB",
+    borderRadius: 6,
     paddingVertical: 12,
-    borderRadius: 5,
+    paddingHorizontal: 50,
+    fontWeight: "700",
+    width: width * 0.8,
+    textAlign: "center",
+    justifyContent: "center",
     alignItems: "center",
   },
-  sendButtonDisabled: {
-    backgroundColor: "#888", // Disabled button color
+  btnText: {
+    fontSize: height * 0.025,
+    color: "white",
+    fontWeight: "700",
   },
-  sendButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+
   footer: {
     position: "absolute",
     bottom: 0,
@@ -209,14 +245,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     backgroundColor: "#004aad",
-    paddingVertical: 10,
+    paddingVertical: 25,
   },
   footerButton: {
     alignItems: "center",
-  },
-  footerText: {
-    color: "#fff",
-    fontSize: 12,
-    marginTop: 5,
   },
 });
