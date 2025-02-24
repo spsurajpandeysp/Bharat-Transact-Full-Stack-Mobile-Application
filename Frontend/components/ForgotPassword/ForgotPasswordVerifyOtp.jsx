@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ImageBackground, Dimensions, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  ImageBackground, 
+  Dimensions, 
+  TouchableOpacity, 
+  TextInput, 
+  Alert, 
+  ActivityIndicator, 
+  KeyboardAvoidingView, 
+  ScrollView,
+  Platform 
+} from 'react-native';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { OtpInput } from "react-native-otp-entry";
 import axios from 'axios';
@@ -69,14 +82,23 @@ export default function FpVo({ navigation, route }) {
         <FontAwesome name="arrow-left" size={30} color="#1F41B1" />
       </TouchableOpacity>
 
-      <Text style={styles.headingText}>Check your email</Text>
-      <View style={styles.content}>
-        <Text style={styles.contentText}>
-          We sent a reset link to your email. Enter the 4-digit code mentioned in the email.
-        </Text>
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+      
+        >
+          <Text style={styles.headingText}>Check your emails</Text>
+          <View style={styles.content}>
+            <Text style={styles.contentText}>
+              We sent a reset link to your email. Enter the 4-digit code mentioned in the email.
+            </Text>
+          </View>
 
-      <OtpInput
+          <OtpInput
         numberOfDigits={4}
         focusColor="blue"
         autoFocus={false}
@@ -103,35 +125,41 @@ export default function FpVo({ navigation, route }) {
           disabledPinCodeContainerStyle: styles.disabledPinCodeContainer,
         }}
       />
-      <TextInput
-        style={styles.textInput}
-        placeholder="New Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Confirm New Password"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
-      <TouchableOpacity onPress={handleSubmit}>
-        <View style={styles.verifyBtn}>
-          <Text style={styles.verifyBtnText}>
-            {loading ? <ActivityIndicator size="small" color="white" /> : "Verify Code"}
-          </Text>
-        </View>
-      </TouchableOpacity>
-      <View style={styles.reSendContainer}>
-        <Text style={styles.resend}>Haven't got the email yet? </Text>
-        <TouchableOpacity onPress={handleResendCode} disabled={resending}>
-          <Text style={styles.resendText}>
-            {resending ? "Resending..." : "Resend Email"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          
+          <TextInput
+            style={styles.textInput}
+            placeholder="New Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Confirm New Password"
+            secureTextEntry
+            value={confirmPassword}
+         
+            onChangeText={setConfirmPassword}
+          />
+          
+          <TouchableOpacity onPress={handleSubmit}>
+            <View style={styles.verifyBtn}>
+              <Text style={styles.verifyBtnText}>
+                {loading ? <ActivityIndicator size="small" color="white" /> : "Verify Code"}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          
+          <View style={styles.reSendContainer}>
+            <Text style={styles.resend}>Haven't got the email yet? </Text>
+            <TouchableOpacity onPress={handleResendCode} disabled={resending}>
+              <Text style={styles.resendText}>
+                {resending ? "Resending..." : "Resend Email"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 }
@@ -139,16 +167,34 @@ export default function FpVo({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
     paddingTop: height * 0.18,
+    paddingBottom: 40, // Add padding for scroll space
   },
   backButton: {
     position: 'absolute',
     top: height * 0.09,
     left: 20,
-    zIndex: 1,
+    zIndex: 2, // Ensure button stays above other content
   },
+  // container: {
+  //   flex: 1,
+  //   justifyContent: "flex-start",
+  //   alignItems: "center",
+  //   paddingTop: height * 0.18,
+  // },
+  // backButton: {
+  //   position: 'absolute',
+  //   top: height * 0.09,
+  //   left: 20,
+  //   zIndex: 1,
+  // },
   headingText: {
     color: "#1F41B1",
     fontSize: height * 0.08,
@@ -241,4 +287,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: height * 0.022,
   },
+  // ... [Keep all other styles the same] ...
+  // Rest of your styles remain unchanged
 });
